@@ -1,0 +1,1 @@
+include ':app',':tencent-adv', ':permission-manager', ':toutiao-adv'

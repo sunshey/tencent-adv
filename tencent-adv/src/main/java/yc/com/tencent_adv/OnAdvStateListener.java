@@ -19,4 +19,8 @@ public interface OnAdvStateListener {
 
     void onNativeExpressShow(Map<NativeExpressADView, Integer> mDatas);
 
+    void onPermissionGranted();
+
+    void onPermissionDenyed();
+
 }

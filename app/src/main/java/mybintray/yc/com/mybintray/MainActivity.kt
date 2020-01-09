@@ -1,8 +1,7 @@
 package mybintray.yc.com.mybintray
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import yc.com.tencent_adv.AdvDispatchManager
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 

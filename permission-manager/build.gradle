@@ -1,14 +1,15 @@
 apply plugin: 'com.android.library'
-// 这里添加下面两行代码。
+
+//// 这里添加下面两行代码。
 //apply plugin: 'com.github.dcendents.android-maven'
 //apply plugin: 'com.jfrog.bintray'
 //
-//version = "8.0"
-//group = "com.wl.tencent-adv"
+//version = "1.0"
+//group = "com.wl"
 //
-//// 定义两个链接，下面会用到。
-//def siteUrl = 'https://github.com/sunshey/tencent-adv' // 项目主页。
-//def gitUrl = 'https://github.com/sunshey/tencent-adv.git' // Git仓库的url。
+//def siteUrl = "https://github.com/sunshey/permission-manager"//项目主页
+//def gitUrl = "https://github.com/sunshey/permission-manager.git"//Git仓库的url。
+
 
 android {
     compileSdkVersion 28
@@ -32,19 +33,17 @@ android {
 
 }
 
-
-
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api files('libs/GDTUnionSDK.4.28.902.min.jar')
-
 }
 
-//install {
+
+//install{
 //    repositories.mavenInstaller {
 //        // 生成pom.xml和参数
 //        pom {
@@ -52,8 +51,8 @@ dependencies {
 //            project {
 //                packaging 'aar'
 //                // 项目描述，复制我的话，这里需要修改。
-//                name 'tencent ad'// 可选，项目名称。
-//                description 'The Android build the advertising of tencent'// 可选，项目描述。
+//                name 'permission manager'// 可选，项目名称。
+//                description 'The Android build the manager of permission'// 可选，项目描述。
 //
 //                url siteUrl // 项目主页，这里是引用上面定义好。
 //                // 软件开源协议，现在一般都是Apache License2.0吧，复制我的，这里不需要修改。
@@ -115,8 +114,7 @@ dependencies {
 //    configurations = ['archives']
 //    pkg {
 //        repo = "wl"  // 上传到maven库。（这里要特别注意，如果写了maven报404错误，请在bintray创建一个仓库，这里填改成你创建的仓库的名字，如何创建请看下图。）
-//        name = "library"
-//        // 发布到Bintray上的项目名字，这里的名字不是compile 'com.yanzhenjie:andserver:1.0.1'中的andserver。
+//        name = "permission-manager"  // 发布到Bintray上的项目名字，这里的名字不是compile 'com.yanzhenjie:andserver:1.0.1'中的andserver。
 ////        userOrg = 'bintray_user' // Bintray的用户名，2016年11月更新。
 //        websiteUrl = siteUrl
 //        vcsUrl = gitUrl
@@ -126,7 +124,7 @@ dependencies {
 //            name = '1.0'
 //            desc = 'leon open library.'//描述，自己定义
 //            released = new Date()
-//            vcsTag = 'v1.0'
+//            vcsTag = '1.0'
 //            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 //        }
 //    }

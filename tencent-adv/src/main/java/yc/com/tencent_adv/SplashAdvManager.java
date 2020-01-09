@@ -24,7 +24,7 @@ public class SplashAdvManager implements OnAdvManagerListener, SplashADListener 
     private String mAdvId;
     private OnAdvStateListener mListener;
 
-    private static final int Time = 1000;
+    private static final int Time = 2500;
     private boolean canJump;
 
     public SplashAdvManager(Activity activity, ViewGroup container, View view, String mediaId, String advId, OnAdvStateListener onAdvStateListener) {
@@ -111,14 +111,6 @@ public class SplashAdvManager implements OnAdvManagerListener, SplashADListener 
         }
 
         mListener.onDismiss(delayTime);
-//        mHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//
-//                startActivity(intent);
-//                finish();
-//            }
-//        }, delayTime);
+
     }
 }

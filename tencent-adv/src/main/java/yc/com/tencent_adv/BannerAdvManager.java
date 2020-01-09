@@ -53,6 +53,9 @@ public class BannerAdvManager implements OnAdvManagerListener {
             @Override
             public void onADReceiv() {
                 Log.i("AD_DEMO", "ONBannerReceive");
+                if (listener!=null){
+                    listener.onShow();
+                }
             }
 
             @Override

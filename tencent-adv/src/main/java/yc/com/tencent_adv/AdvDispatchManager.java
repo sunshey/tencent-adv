@@ -3,12 +3,12 @@ package yc.com.tencent_adv;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -28,6 +28,19 @@ public class AdvDispatchManager {
 
     private OnAdvManagerListener listener;
 
+    private AdvType mAdvType;
+    private ViewGroup mContanier;
+    private View mView;
+    private String mMediaId;
+    private String mAdvId;
+    private int mNativeCount;
+    private List<Integer> mNativePositions;
+    private OnAdvStateListener mOnAdvStateListener;
+
+
+    private AdvDispatchManager() {
+    }
+
     public static AdvDispatchManager getManager() {
         if (manager == null) {
             synchronized (AdvDispatchManager.class) {
@@ -43,27 +56,39 @@ public class AdvDispatchManager {
 
     public void init(Activity activity, AdvType advType, ViewGroup container, View view, String mediaId, String advId, int nativeCount, List<Integer> nativePositions, OnAdvStateListener onAdvStateListener) {
         this.mActivity = activity;
-        if (advType.type == 1) {
-            listener = new SplashAdvManager(mActivity, container, view, mediaId, advId, onAdvStateListener);
-        } else if (advType.type == 2) {
-            listener = new BannerAdvManager(mActivity, container, mediaId, advId, onAdvStateListener);
-        } else if (advType.type == 3) {
-            listener = new ProtogenesisAdvPicManager(mActivity, mediaId, advId, nativeCount, nativePositions, onAdvStateListener);
-        } else if (advType.type == 4) {
-            listener = new ProtogenesisAdvVideoManager(mActivity, container, mediaId, advId, nativeCount, onAdvStateListener);
-        }
+        this.mAdvType = advType;
+        this.mContanier = container;
+        this.mView = view;
+        this.mMediaId = mediaId;
+        this.mAdvId = advId;
+        this.mNativeCount = nativeCount;
+        this.mNativePositions = nativePositions;
+        this.mOnAdvStateListener = onAdvStateListener;
         dispatchPermisson();
 
     }
-
 
     public void init(Activity activity, AdvType advType, ViewGroup container, View view, String mediaId, String advId, OnAdvStateListener onAdvStateListener) {
         this.init(activity, advType, container, view, mediaId, advId, 0, null, onAdvStateListener);
     }
 
 
+    private void showAD() {
+        if (mAdvType.type == 1) {
+            listener = new SplashAdvManager(mActivity, mContanier, mView, mMediaId, mAdvId, mOnAdvStateListener);
+        } else if (mAdvType.type == 2) {
+            listener = new BannerAdvManager(mActivity, mContanier, mMediaId, mAdvId, mOnAdvStateListener);
+        } else if (mAdvType.type == 3) {
+            listener = new ProtogenesisAdvPicManager(mActivity, mMediaId, mAdvId, mNativeCount, mNativePositions, mOnAdvStateListener);
+        } else if (mAdvType.type == 4) {
+            listener = new ProtogenesisAdvVideoManager(mActivity, mContanier, mMediaId, mAdvId, mNativeCount, mOnAdvStateListener);
+        }
+        listener.showAdv();
+    }
+
+
     private void dispatchPermisson() {
-        if (mActivity == null || listener == null) {
+        if (mActivity == null) {
             throw new RuntimeException("必须先调用init()方法");
         }
 
@@ -71,7 +96,8 @@ public class AdvDispatchManager {
             checkAndRequestPermission();
         } else {
             // 如果是Android6.0以下的机器，默认在安装时获得了所有权限，可以直接调用SDK
-            listener.showAdv();
+            if (mOnAdvStateListener != null) mOnAdvStateListener.onPermissionGranted();
+            showAD();
         }
     }
 
@@ -92,7 +118,9 @@ public class AdvDispatchManager {
         if (mActivity == null) {
             throw new RuntimeException("必须先调用init()方法");
         }
-        List<String> lackedPermission = new ArrayList<String>();
+        List<String> lackedPermission = new ArrayList<>();
+
+
         if (!(mActivity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
             lackedPermission.add(Manifest.permission.READ_PHONE_STATE);
         }
@@ -107,12 +135,15 @@ public class AdvDispatchManager {
 
         // 权限都已经有了，那么直接调用SDK
         if (lackedPermission.size() == 0) {
-            listener.showAdv();
+            if (mOnAdvStateListener != null) mOnAdvStateListener.onPermissionGranted();
+            showAD();
         } else {
+            if (mOnAdvStateListener != null) mOnAdvStateListener.onPermissionDenyed();
             // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限，如果获得权限就可以调用SDK，否则不要调用SDK。
             String[] requestPermissions = new String[lackedPermission.size()];
             lackedPermission.toArray(requestPermissions);
             mActivity.requestPermissions(requestPermissions, 1024);
+
         }
     }
 
@@ -127,8 +158,8 @@ public class AdvDispatchManager {
 
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == 1024 && hasAllPermissionsGranted(grantResults)) {
-            listener.showAdv();
+        if (hasAllPermissionsGranted(grantResults)) {
+            showAD();
         } else {
             // 如果用户没有授权，那么应该说明意图，引导用户去设置里面授权。
             Toast.makeText(mActivity, "应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。", Toast.LENGTH_LONG).show();
@@ -140,11 +171,13 @@ public class AdvDispatchManager {
     }
 
     public void onResume() {
-        listener.onResume();
+        if (listener != null)
+            listener.onResume();
     }
 
     public void onPause() {
-        listener.onPause();
+        if (listener != null)
+            listener.onPause();
     }
 
 }
